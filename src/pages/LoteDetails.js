@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useContext, useEffect, useCallback } from "react"
 import Title from "../components/Title"
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
@@ -8,42 +8,61 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import { useParams } from "react-router-dom";
+import { LancesContext } from "../providers/LancesProvider";
 
 export default function NewLote() {
 
+    const { id } = useParams()
+    const { lances, newLance } = useContext(LancesContext)
     const [newLanceNome, setNewLanceNome] = useState("")
     const [newLanceValor, setNewLanceValor] = useState(0)
     const [isLancePrivate, setIsLancePrivate] = useState(false)
+    const [selectedLance, setSelectedLance] = useState()
+    const [rows, setRows] = useState([])
+    useEffect(() => {
+        const lanceId = parseInt(id)
+        setSelectedLance(lances[lanceId])
+    }, [id, lances])
 
-    const rows = [
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-        {valor: "10", data: "21/03/2021", proprietario: "Mateus Nobre"},
-    ]
+    useEffect(()=>{
+        if(!selectedLance) return
+        const newRows = selectedLance.lances.map(lance => ({
+            valor: lance.valor,
+            data: new Date(lance.date).toString(),
+            proprietario: lance.user
+        }))
 
-    return <div style={{display: "flex", padding: 16, flexDirection: "column", backgroundColor:"#DCE6FF", height: "calc(100vh - 32px)"}}>
-        <Paper style={{height: "calc(50vh - 24px)", padding: "8px"}}>
-           <Title>Detalhes do Lote</Title>
+        setRows(newRows)
+
+    }, [selectedLance])
+
+    const sendNewLance = useCallback(()=> {
+        newLance(id, newLanceNome, isLancePrivate, newLanceValor)
+        setNewLanceNome("")
+        setIsLancePrivate(false)
+        setNewLanceValor("")
+    }, [id, isLancePrivate, newLance, newLanceNome, newLanceValor])
+
+    if(!selectedLance)
+        return <div>Loading...</div>
+
+    return <div style={{ display: "flex", padding: 16, flexDirection: "column", backgroundColor: "#DCE6FF", height: "calc(100vh - 32px)" }}>
+        <Paper style={{ height: "calc(50vh - 24px)", padding: "8px" }}>
+            <Title>Detalhes do Lote</Title>
             <h4>Lote</h4>
-            <div>Teste</div>
+            <div>{selectedLance.title}</div>
             <h4>Data</h4>
-            <div>Teste</div>
+            <div>{new Date(selectedLance.date).toDateString()}</div>
             <h4>Descrição</h4>
-            <div>Teste</div>
+            <div>{selectedLance.descricao}</div>
             <h4>Vendedor</h4>
-            <div>Teste</div>
+            <div>{selectedLance.autor}</div>
             <h4>Valor Atual</h4>
-            <div>Teste</div>
+            <div>{selectedLance.valor}</div>
         </Paper>
-        <div style={{display: "flex", width: "100%", flexDirection: "row", justifyContent: "space-between", marginTop: "16px", height: "calc(50vh - 24px)"}}>
-            <Paper style={{width:"calc(50% - 24px)", padding: "8px", display: "flex", flexDirection:"column"}} >
+        <div style={{ display: "flex", width: "100%", flexDirection: "row", justifyContent: "space-between", marginTop: "16px", height: "calc(50vh - 24px)" }}>
+            <Paper style={{ width: "calc(50% - 24px)", padding: "8px", display: "flex", flexDirection: "column" }} >
                 <Title>Novo Lance</Title>
                 <label>Nome</label>
                 <TextField value={newLanceNome} onChange={e => setNewLanceNome(e.target.value)} />
@@ -55,29 +74,29 @@ export default function NewLote() {
                     label="Lance Privado"
                     control={<Checkbox />}
                 />
-                <Button variant="contained" color="primary" style={{marginTop: 16}} >Fazer Lance</Button>   
+                <Button variant="contained" color="primary" style={{ marginTop: 16 }} onClick={sendNewLance}  >Fazer Lance</Button>
             </Paper>
-            <Paper style={{width:"calc(50% - 24px)", padding: "8px", overflowY: "auto"}} >
+            <Paper style={{ width: "calc(50% - 24px)", padding: "8px", overflowY: "auto" }} >
                 <Title>Lances Feitos</Title>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Valor</TableCell>
                             <TableCell>Data</TableCell>
-                            <TableCell>Proprietario</TableCell>
+                            <TableCell>Propritario</TableCell>
+                            <TableCell>Valor</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {rows.map(item => (
                             <TableRow>
-                                <TableCell>{item.valor}</TableCell>
                                 <TableCell>{item.data}</TableCell>
                                 <TableCell>{item.proprietario}</TableCell>
+                                <TableCell>${item.valor}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
-            </Paper> 
+            </Paper>
         </div>
     </div>
 }

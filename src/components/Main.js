@@ -22,7 +22,7 @@ export default function Main() {
               </div>
           </Grid>
         </div>
-        <Grid style={{padding:16, backgroundColor: "#E7F2F8"}}>
+        <Grid style={{padding:16, backgroundColor: "white"}}>
           <Orders></Orders>
         </Grid>
       </Paper>

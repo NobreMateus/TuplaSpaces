@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext } from 'react';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -7,53 +7,18 @@ import TableRow from '@material-ui/core/TableRow';
 import {
   Link
 } from "react-router-dom";
+import {LancesContext} from '../providers/LancesProvider' 
 
 // Generate Order Data
-function createData(id, date, name, shipTo, paymentMethod, amount) {
-  return { id, date, name, shipTo, paymentMethod, amount };
-}
-
-const rows = [
-  createData(
-    0,
-    '16 Mar, 2019',
-    'Elvis Presley',
-    'Tupelo, MS',
-    'VISA ⠀•••• 3719',
-    312.44,
-  ),
-  createData(
-    1,
-    '16 Mar, 2019',
-    'Paul McCartney',
-    'London, UK',
-    'VISA ⠀•••• 2574',
-    866.99,
-  ),
-  createData(2, '16 Mar, 2019', 'Tom Scholz', 'Boston, MA', 'MC ⠀•••• 1253', 100.81),
-  createData(
-    3,
-    '16 Mar, 2019',
-    'Michael Jackson',
-    'Gary, IN',
-    'AMEX ⠀•••• 2000',
-    654.39,
-  ),
-  createData(
-    4,
-    '15 Mar, 2019',
-    'Bruce Springsteen',
-    'Long Branch, NJ',
-    'VISA ⠀•••• 5919',
-    212.79,
-  ),
-];
 
 function preventDefault(event) {
   event.preventDefault();
 }
 
 export default function Orders() {
+
+  const { lances } = useContext( LancesContext )
+
   return (
     <React.Fragment>
       <Table size="small">
@@ -63,21 +28,21 @@ export default function Orders() {
             <TableCell>Lote</TableCell>
             <TableCell>Descrição</TableCell>
             <TableCell>Vendedor</TableCell>
-            <TableCell align="right">Valor</TableCell>
+            <TableCell align="right">Valor Atual</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {lances.map((row) => (
             <TableRow key={row.id}>
-                <TableCell>{row.date}</TableCell>
+                <TableCell>{new Date(row.date).toDateString()}</TableCell>
                 <TableCell>
-                  <Link to={`details/${123}`}>
-                    {row.name}
+                  <Link to={`details/${row.id}`}>
+                    {row.title}
                   </Link>
                   </TableCell>
-                <TableCell>{row.shipTo}</TableCell>
-                <TableCell>{row.paymentMethod}</TableCell>
-                <TableCell align="right">{`$${row.amount}`}</TableCell>
+                <TableCell>{row.descricao}</TableCell>
+                <TableCell>{row.autor}</TableCell>
+                <TableCell align="right">{`$${row.valor}`}</TableCell>
             </TableRow>
           ))}
         </TableBody>

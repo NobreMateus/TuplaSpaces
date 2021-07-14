@@ -8,22 +8,20 @@ export default function NewLote() {
 
     const [title, setTitle] = useState("")
     const [descricao, setDescricao] = useState("")
-    const [vendedor, setVendedor] = useState("")
     const [valor, setValor] = useState("")
 
-    const { newLote } = useContext( LancesContext )
+    const { newLote, username } = useContext( LancesContext )
 
     useEffect(() => {
         
     }, [])
 
     const sendNewLote = useCallback(()=>{
-        newLote(title, descricao, valor, vendedor)
+        newLote(title, descricao, valor, username)
         setTitle("")
         setDescricao("")
-        setVendedor("")
         setValor("")
-    },[descricao, title, valor, vendedor, newLote]) 
+    },[descricao, title, valor, username, newLote]) 
 
     return <div style={{display: "flex", padding: 16, flexDirection: "column", height: "100vh", backgroundColor: "#DCE6FF" }}>
         <Paper style={{display: "flex", flexDirection: "column", padding: 16}}>
@@ -32,8 +30,8 @@ export default function NewLote() {
             <TextField value = { title } onChange = {(e)=>setTitle(e.target.value)} />
             <label>Descrição</label>
             <TextField value = { descricao } onChange = {(e) => setDescricao(e.target.value)} />
-            <label>Vendedor</label>
-            <TextField value = {vendedor} onChange = {(e) => setVendedor(e.target.value) } />
+            {/* <label>Vendedor</label>
+            <TextField value = {vendedor} onChange = {(e) => setVendedor(e.target.value) } /> */}
             <label>Valor Inicial</label>
             <TextField  value = {valor} onChange = {(e) => setValor(e.target.value) } />
             <Button onClick={sendNewLote} style={{marginTop: 16}} color="primary" variant="contained" >Adicionar</Button>

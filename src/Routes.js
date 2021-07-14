@@ -9,6 +9,7 @@ import {
   Route,
 } from "react-router-dom";
 import NewLote from "./pages/NewLote";
+import Login from "./pages/Login";
 
 export default function Routes() {
   return (
@@ -21,8 +22,11 @@ export default function Routes() {
             <Route path="/newLote">
               <NewLote />
             </Route>
-            <Route path="/">
+            <Route path="/main">
               <Main />
+            </Route>
+            <Route path="/">
+              <Login />
             </Route>
           </Switch>
       </Router>

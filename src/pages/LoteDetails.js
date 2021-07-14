@@ -14,12 +14,12 @@ import { LancesContext } from "../providers/LancesProvider";
 export default function NewLote() {
 
     const { id } = useParams()
-    const { lances, newLance } = useContext(LancesContext)
-    const [newLanceNome, setNewLanceNome] = useState("")
+    const { lances, newLance, username } = useContext(LancesContext)
     const [newLanceValor, setNewLanceValor] = useState(0)
     const [isLancePrivate, setIsLancePrivate] = useState(false)
     const [selectedLance, setSelectedLance] = useState()
     const [rows, setRows] = useState([])
+    
     useEffect(() => {
         const lanceId = parseInt(id)
         setSelectedLance(lances[lanceId])
@@ -30,7 +30,8 @@ export default function NewLote() {
         const newRows = selectedLance.lances.map(lance => ({
             valor: lance.valor,
             data: new Date(lance.date).toString(),
-            proprietario: lance.user
+            proprietario: lance.user,
+            isPrivate: lance.isPrivate
         }))
 
         setRows(newRows)
@@ -38,11 +39,9 @@ export default function NewLote() {
     }, [selectedLance])
 
     const sendNewLance = useCallback(()=> {
-        newLance(id, newLanceNome, isLancePrivate, newLanceValor)
-        setNewLanceNome("")
-        setIsLancePrivate(false)
+        newLance(id, username, isLancePrivate, newLanceValor)
         setNewLanceValor("")
-    }, [id, isLancePrivate, newLance, newLanceNome, newLanceValor])
+    }, [id, isLancePrivate, newLance, username, newLanceValor])
 
     if(!selectedLance)
         return <div>Loading...</div>
@@ -64,12 +63,11 @@ export default function NewLote() {
         <div style={{ display: "flex", width: "100%", flexDirection: "row", justifyContent: "space-between", marginTop: "16px", height: "calc(50vh - 24px)" }}>
             <Paper style={{ width: "calc(50% - 24px)", padding: "8px", display: "flex", flexDirection: "column" }} >
                 <Title>Novo Lance</Title>
-                <label>Nome</label>
-                <TextField value={newLanceNome} onChange={e => setNewLanceNome(e.target.value)} />
+                {/* <label>Nome</label>
+                <TextField value={newLanceNome} onChange={e => setNewLanceNome(e.target.value)} /> */}
                 <label>Valor</label>
                 <TextField value={newLanceValor} onChange={e => setNewLanceValor(e.target.value)} />
                 <FormControlLabel
-                    value={isLancePrivate}
                     onChange={e => setIsLancePrivate(e.target.checked)}
                     label="Lance Privado"
                     control={<Checkbox />}
@@ -90,7 +88,11 @@ export default function NewLote() {
                         {rows.map(item => (
                             <TableRow>
                                 <TableCell>{item.data}</TableCell>
-                                <TableCell>{item.proprietario}</TableCell>
+                                <TableCell>{ 
+                                    item.isPrivate ? 
+                                        (item.proprietario === username || selectedLance.autor === username) ? item.proprietario : "Privado" 
+                                        : item.proprietario
+                                }</TableCell>
                                 <TableCell>${item.valor}</TableCell>
                             </TableRow>
                         ))}

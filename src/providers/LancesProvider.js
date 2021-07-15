@@ -17,7 +17,12 @@ export const LancesContext = createContext({
     setSelectedChat: undefined,
     socketManager: undefined,
     contacts: [],
-    setContacts: undefined
+    setContacts: undefined,
+    online: true,
+    setOnline: undefined,
+    toogleOnline: undefined,
+    messages: [],
+    setMessages: undefined
 })
 
 export default function LancesProvider(props) {
@@ -29,6 +34,8 @@ export default function LancesProvider(props) {
     const [distanceRadius, setDistanceRadius] = useState(0)
     const [selectedChat, setSelectedChat] = useState("")
     const [contacts, setContacts] = useState([])
+    const [online, setOnline] = useState(true)
+    const [messages, setMessages] = useState([])
 
     const socketManager = useMemo(()=>{
         return SocketManager.shared
@@ -66,8 +73,47 @@ export default function LancesProvider(props) {
                 return newCont
             })
         })  
-    
+
+        SocketManager.shared.socket.on('chat-messages', (data)=>{
+            debugger
+            //const orderedMessages = data.messages.map(message => ({username: message.sender, name: message.sender, message: message.content}))
+            setMessages(data.messages)
+        })
+
+        SocketManager.shared.socket.on('get-new-message', (data)=>{
+            console.log(data)
+            //const orderedMessages = data.messages.map(message => ({username: message.sender, name: message.sender, message: message.content}))
+            setMessages(old => {
+                let newMess = old.concat()
+                newMess.push(data.message)
+                return newMess
+            })
+        })
+        
     },[])
+
+    const toogleOnline = useCallback(()=>{
+        setOnline(old => {
+            if(!old) {
+                SocketManager.shared.socket.emit('toogle-on', {
+                    username: username,
+                    name: name,
+                    latitude: latitude,
+                    longitude: longitude
+                })
+            } else {
+                SocketManager.shared.socket.emit('toogle-off', {})
+            }
+            return !old 
+        })
+
+    }, [latitude, longitude, name, username])
+
+    useEffect(()=>{
+        
+
+
+    }, [online])
 
     return (
         <LancesContext.Provider value = {{
@@ -85,7 +131,12 @@ export default function LancesProvider(props) {
             setSelectedChat: setSelectedChat,
             socketManager: socketManager,
             contacts: contacts, 
-            setContacts: setContacts
+            setContacts: setContacts,
+            online: online,
+            setOnline: setOnline,
+            toogleOnline: toogleOnline,
+            messages: messages,
+            setMessages: setMessages
         }}>
             {props.children}
         </LancesContext.Provider>

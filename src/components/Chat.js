@@ -7,11 +7,11 @@ import { LancesContext } from '../providers/LancesProvider'
 export default function Chat() {
 
     const {
-        username, name, socketManager, selectedChat
+        username, name, socketManager, selectedChat, online, messages, setMessages
     } = useContext(LancesContext)
 
-    const [messages, setMessages] = useState([
-    ])
+    // const [messages, setMessages] = useState([
+    // ])
 
     const [currentMessage, setCurrentMessage] = useState("")
 
@@ -32,20 +32,22 @@ export default function Chat() {
 
     useEffect(()=>{
         if(!socketManager.socket) return
-        socketManager.socket.on('chat-messages', (data)=>{
-            debugger
-            //const orderedMessages = data.messages.map(message => ({username: message.sender, name: message.sender, message: message.content}))
-            setMessages(data.messages)
-        })
 
-        socketManager.socket.on('get-new-message', (data)=>{
-            //const orderedMessages = data.messages.map(message => ({username: message.sender, name: message.sender, message: message.content}))
-            setMessages(old => {
-                let newMess = old.concat()
-                newMess.push(data.message)
-                return newMess
-            })
-        })
+        // socketManager.socket.on('chat-messages', (data)=>{
+        //     debugger
+        //     //const orderedMessages = data.messages.map(message => ({username: message.sender, name: message.sender, message: message.content}))
+        //     setMessages(data.messages)
+        // })
+
+        // socketManager.socket.on('get-new-message', (data)=>{
+        //     console.log(data)
+        //     //const orderedMessages = data.messages.map(message => ({username: message.sender, name: message.sender, message: message.content}))
+        //     setMessages(old => {
+        //         let newMess = old.concat()
+        //         newMess.push(data.message)
+        //         return newMess
+        //     })
+        // })
         
     },[socketManager.socket])
 
@@ -74,6 +76,7 @@ export default function Chat() {
                 color="primary" 
                 variant="contained"
                 onClick={sendMessage}
+                disabled={!online}
             >
                 Enviar
             </Button>
